@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13º Salário | SuporteADV</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d0d0d; color: #e0e0e0; padding: 24px 16px; }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+  h1 { font-size: 1.5rem; color: #008080; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #888; line-height: 1.5; }
+  .brand { font-size: 0.78rem; margin-top: 8px; color: #555; }
+  .brand span.s { color: #8B00FF; font-weight: 700; }
+  .brand span.a { color: #008080; font-weight: 700; }
+
+  .card { background: #111; border-radius: 10px; border: 1px solid #222; border-left: 3px solid #8B00FF; padding: 20px 22px; margin-bottom: 14px; transition: border-left-color 0.2s; }
+  .card:hover { border-left-color: #008080; }
+  .card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
+  .field.full { grid-column: 1 / -1; }
+
+  .field label { display: block; font-size: 0.78rem; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; border: 1.5px solid #333; border-radius: 6px;
+    font-size: 0.95rem; color: #fff; background: #1a1a1a; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #008080; box-shadow: 0 0 0 2px rgba(0,128,128,0.2); }
+  .field select option { background: #1a1a1a; }
+
+  .info-box { background: #0d1a1a; border: 1px solid #1a3a3a; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.82rem; color: #666; line-height: 1.6; }
+  .info-box b { color: #008080; }
+
+  button.calcular { background: #008080; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; cursor: pointer; transition: background 0.18s; text-transform: uppercase; }
+  button.calcular:hover { background: #006666; box-shadow: 0 0 10px rgba(0,128,128,0.4); }
+
+  /* Resultado */
+  .resultado { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 10px; padding: 20px 22px; margin-top: 14px; display: none; }
+  .resultado.visible { display: block; }
+  .resultado-titulo { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .res-principal { text-align: center; margin-bottom: 20px; }
+  .res-principal label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+  .res-principal .v { font-size: 1.8rem; font-weight: 700; color: #00ff00; font-family: 'Courier New', monospace; }
+  .res-principal .sub { font-size: 0.82rem; color: #555; margin-top: 4px; }
+
+  /* Parcelas */
+  .parcelas-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .parc-card { background: #111; border-radius: 8px; border: 1px solid #1a3a1a; padding: 14px; text-align: center; }
+  .parc-card .pc-num { font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+  .parc-card .pc-val { font-size: 1.1rem; font-weight: 700; color: #008080; font-family: 'Courier New', monospace; }
+  .parc-card .pc-info { font-size: 0.72rem; color: #444; margin-top: 4px; }
+  .parc-card.paga { border-color: #1a3a1a; }
+  .parc-card.pendente { border-color: #3a3a1a; }
+  .parc-card.pendente .pc-val { color: #ffaa00; }
+
+  .res-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .res-grid { grid-template-columns: 1fr 1fr; } }
+  .res-item label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+  .res-item .valor { font-size: 1rem; font-weight: 700; color: #ccc; font-family: 'Courier New', monospace; }
+  .res-item .valor.teal { color: #008080; }
+  .res-item .valor.sec { color: #555; font-size: 0.9rem; }
+
+  .divider { border: none; border-top: 1px solid #1a3a1a; margin: 14px 0; }
+
+  .comp-lista { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .comp-item { display: flex; justify-content: space-between; padding: 10px 14px; background: #111; border-radius: 8px; border-left: 3px solid #333; }
+  .comp-item.teal { border-left-color: #008080; }
+  .comp-item.amarelo { border-left-color: #ffaa00; }
+  .comp-item.vermelho { border-left-color: #ff4444; }
+  .comp-item.total { background: #0d1a0d; border-left-color: #00ff00; }
+  .comp-item .ci-nome { font-size: 0.85rem; color: #888; }
+  .comp-item .ci-valor { font-size: 0.95rem; font-weight: 700; font-family: 'Courier New', monospace; color: #008080; }
+  .comp-item.total .ci-nome { color: #fff; font-weight: 700; }
+  .comp-item.total .ci-valor { color: #00ff00; font-size: 1.05rem; }
+
+  /* Calendário de meses */
+  .meses-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-top: 14px; }
+  @media (max-width: 520px) { .meses-grid { grid-template-columns: repeat(4,1fr); } }
+  .mes-item { background: #1a1a1a; border-radius: 6px; padding: 6px; text-align: center; border: 1px solid #222; font-size: 0.72rem; }
+  .mes-item.trabalhado { background: #0a1a0a; border-color: #1a4a1a; color: #00ff00; font-weight: 700; }
+  .mes-item.parcial { background: #1a1a0a; border-color: #3a3a1a; color: #ffaa00; }
+  .mes-item.nao-trabalhado { color: #333; }
+
+  .erro { background: #1a0a0a; border: 1px solid #4a1a1a; border-radius: 8px; padding: 14px 16px; color: #ff6666; font-size: 0.88rem; margin-top: 14px; display: none; }
+  .erro.visible { display: block; }
+  .aviso { font-size: 0.72rem; color: #444; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>13º Salário Proporcional</h1>
+    <p class="subtitle">Calcule o 13º salário integral ou proporcional, com parcelas, deduções e calendário de meses trabalhados.</p>
+    <p class="brand"><span class="s">suporte</span><span class="a">ADV</span>.br — Ferramentas para Advogados</p>
+  </div>
+
+  <div class="card">
+    <div class="info-box">
+      <b>Regras do 13º salário (Lei 4.090/62):</b> Pago em 2 parcelas — 1ª entre fevereiro e novembro (50% do salário), 2ª até 20 de dezembro (saldo). Proporcional: 1/12 por mês trabalhado, contando-se como mês completo a fração ≥ 15 dias.
+    </div>
+
+    <div class="card-label">Dados</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Salário mensal bruto (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 3500,00" step="0.01" min="0">
+      </div>
+      <div class="field">
+        <label>Tipo de cálculo</label>
+        <select id="tipo">
+          <option value="proporcional">Proporcional (admissão/demissão no ano)</option>
+          <option value="integral">Integral (ano completo)</option>
+          <option value="adiantamento">Adiantamento da 1ª parcela</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Meses trabalhados no ano</label>
+        <input type="number" id="meses" value="12" min="1" max="12">
+      </div>
+      <div class="field">
+        <label>Dias trabalhados no mês parcial</label>
+        <input type="number" id="diasMesParcial" value="0" min="0" max="31" placeholder="0 = não há">
+      </div>
+      <div class="field">
+        <label>Adicionais/médias variáveis (R$/mês)</label>
+        <input type="number" id="medias" value="0" step="0.01" min="0" placeholder="Comissões, HE médias...">
+      </div>
+      <div class="field">
+        <label>Dependentes para IR</label>
+        <input type="number" id="dependentes" value="0" min="0" max="20">
+      </div>
+      <div class="field">
+        <label>1ª parcela já paga (R$)</label>
+        <input type="number" id="primeiraParcela" value="0" step="0.01" min="0" placeholder="0 se ainda não foi paga">
+      </div>
+      <div class="field">
+        <label>Mês de referência</label>
+        <select id="mesReferencia">
+          <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+          <option value="3">Março</option><option value="4">Abril</option>
+          <option value="5">Maio</option><option value="6">Junho</option>
+          <option value="7">Julho</option><option value="8">Agosto</option>
+          <option value="9">Setembro</option><option value="10">Outubro</option>
+          <option value="11">Novembro</option><option value="12" selected>Dezembro</option>
+        </select>
+      </div>
+    </div>
+    <button class="calcular" onclick="calcular()">CALCULAR</button>
+  </div>
+
+  <div class="erro" id="erro"></div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-titulo" id="res-titulo">13º Salário</div>
+
+    <div class="res-principal">
+      <label id="label-total">💰 Total do 13º salário</label>
+      <div class="v" id="res-total">—</div>
+      <div class="sub" id="res-sub">—</div>
+    </div>
+
+    <div class="parcelas-box">
+      <div class="parc-card paga">
+        <div class="pc-num">1ª Parcela (até novembro)</div>
+        <div class="pc-val" id="res-1a">—</div>
+        <div class="pc-info">50% do salário base</div>
+      </div>
+      <div class="parc-card pendente">
+        <div class="pc-num">2ª Parcela (até 20/dez)</div>
+        <div class="pc-val" id="res-2a">—</div>
+        <div class="pc-info" id="info-2a">Saldo — com deduções</div>
+      </div>
+    </div>
+
+    <div class="res-grid">
+      <div class="res-item"><label>Salário base</label><div class="valor teal" id="res-salario">—</div></div>
+      <div class="res-item"><label>Meses trabalhados</label><div class="valor" id="res-meses">—</div></div>
+      <div class="res-item"><label>Avos</label><div class="valor sec" id="res-avos">—</div></div>
+    </div>
+
+    <hr class="divider">
+    <div class="resultado-titulo">Composição</div>
+    <div class="comp-lista" id="comp-lista"></div>
+
+    <div class="resultado-titulo" style="margin-top:14px">Meses no Ano</div>
+    <div class="meses-grid" id="meses-grid"></div>
+
+    <p class="aviso">⚠️ O INSS e o IR incidem apenas na 2ª parcela. A base de cálculo inclui médias de horas extras habituais, adicional noturno, gorjetas e outros (TST, Súmula 45). O cálculo de IR apresentado é estimativa — verifique a tabela vigente na Receita Federal.</p>
+  </div>
+
+</div>
+
+<script>
+const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function fmtMoeda(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+
+function calcINSS(base) {
+  if (base <= 1412) return base * 0.075;
+  if (base <= 2666.68) return base * 0.09;
+  if (base <= 4000.03) return base * 0.12;
+  if (base <= 7786.02) return base * 0.14;
+  return 7786.02 * 0.14;
+}
+
+function calcIR(base, dep) {
+  const deducaoDep = dep * 189.59;
+  const baseIR = Math.max(0, base - deducaoDep);
+  if (baseIR <= 2259.20) return 0;
+  if (baseIR <= 2826.65) return baseIR * 0.075 - 169.44;
+  if (baseIR <= 3751.05) return baseIR * 0.15 - 381.44;
+  if (baseIR <= 4664.68) return baseIR * 0.225 - 662.77;
+  return baseIR * 0.275 - 896.00;
+}
+
+function showErro(msg) {
+  document.getElementById('erro').textContent = msg;
+  document.getElementById('erro').classList.add('visible');
+  document.getElementById('resultado').classList.remove('visible');
+}
+function hideErro() { document.getElementById('erro').classList.remove('visible'); }
+
+function calcular() {
+  hideErro();
+  const salario = parseFloat(document.getElementById('salario').value);
+  if (!salario || salario <= 0) return showErro('Informe o salário mensal bruto.');
+
+  const tipo = document.getElementById('tipo').value;
+  let meses = parseInt(document.getElementById('meses').value) || 12;
+  const diasParcial = parseInt(document.getElementById('diasMesParcial').value) || 0;
+  const medias = parseFloat(document.getElementById('medias').value) || 0;
+  const dependentes = parseInt(document.getElementById('dependentes').value) || 0;
+  const primeiraPaga = parseFloat(document.getElementById('primeiraParcela').value) || 0;
+  const mesRef = parseInt(document.getElementById('mesReferencia').value);
+
+  const salarioBase = salario + medias;
+
+  // Avos — fração >= 15 dias conta como mês
+  let avos = meses;
+  if (diasParcial >= 15) avos = Math.min(12, avos + 1);
+
+  if (tipo === 'integral') avos = 12;
+  if (tipo === 'adiantamento') avos = Math.min(12, avos);
+
+  const decimoTerceiro = salarioBase * (avos / 12);
+
+  // Parcelas
+  const primeiraParcela = decimoTerceiro / 2;
+  const inss2a = calcINSS(decimoTerceiro);
+  const ir2a = Math.max(0, calcIR(decimoTerceiro - inss2a, dependentes));
+  const segundaParcela = decimoTerceiro - primeiraPaga - inss2a - ir2a;
+  const liquido = decimoTerceiro - inss2a - ir2a;
+
+  // Labels
+  const nomeTipo = { proporcional:'Proporcional', integral:'Integral', adiantamento:'Adiantamento 1ª Parcela' };
+  document.getElementById('res-titulo').textContent = `13º Salário — ${nomeTipo[tipo]}`;
+  document.getElementById('label-total').textContent = tipo === 'adiantamento' ? '💰 Valor do adiantamento' : '💰 13º salário bruto';
+  document.getElementById('res-total').textContent = fmtMoeda(tipo === 'adiantamento' ? primeiraParcela : decimoTerceiro);
+  document.getElementById('res-sub').textContent = `${avos}/12 avos | Base: ${fmtMoeda(salarioBase)} | Líquido: ${fmtMoeda(liquido)}`;
+  document.getElementById('res-salario').textContent = fmtMoeda(salarioBase);
+  document.getElementById('res-meses').textContent = avos + ' meses';
+  document.getElementById('res-avos').textContent = avos + '/12';
+  document.getElementById('res-1a').textContent = fmtMoeda(primeiraParcela);
+  document.getElementById('res-2a').textContent = fmtMoeda(Math.max(0, segundaParcela));
+  document.getElementById('info-2a').textContent = primeiraPaga > 0 ? `Desconta 1ª paga: ${fmtMoeda(primeiraPaga)}` : 'Saldo com deduções';
+
+  // Composição
+  const lista = document.getElementById('comp-lista');
+  lista.innerHTML = '';
+  const addItem = (nome, valor, cls='', tot=false) => {
+    const div = document.createElement('div');
+    div.className = `comp-item${cls?' '+cls:''}${tot?' total':''}`;
+    div.innerHTML = `<span class="ci-nome">${nome}</span><span class="ci-valor" style="${cls==='vermelho'?'color:#ff4444':cls==='amarelo'?'color:#ffaa00':''}">${fmtMoeda(valor)}</span>`;
+    lista.appendChild(div);
+  };
+  addItem('Salário base', salario);
+  if (medias > 0) addItem('Médias variáveis', medias);
+  addItem(`13º bruto (${avos}/12 × ${fmtMoeda(salarioBase)})`, decimoTerceiro, 'teal');
+  addItem('1ª Parcela (50%)', primeiraParcela);
+  addItem(`INSS — 2ª parcela`, -inss2a, 'vermelho');
+  addItem(`IR estimado — 2ª parcela (${dependentes} dep.)`, -ir2a, 'vermelho');
+  if (primeiraPaga > 0) addItem('1ª parcela já paga (deduzida)', -primeiraPaga, 'amarelo');
+  addItem('2ª Parcela líquida', Math.max(0, segundaParcela), 'teal');
+  addItem('TOTAL LÍQUIDO', liquido, '', true);
+
+  // Calendário de meses
+  const grid = document.getElementById('meses-grid');
+  grid.innerHTML = '';
+  mesesNomes.forEach((m, i) => {
+    const num = i + 1;
+    const div = document.createElement('div');
+    let cls = 'mes-item';
+    let txt = m;
+    if (num <= meses) { cls += ' trabalhado'; }
+    else if (num === meses + 1 && diasParcial >= 15) { cls += ' trabalhado'; txt = m + '*'; }
+    else if (num === meses + 1 && diasParcial > 0) { cls += ' parcial'; txt = m + `(${diasParcial}d)`; }
+    else { cls += ' nao-trabalhado'; }
+    div.className = cls;
+    div.textContent = txt;
+    grid.appendChild(div);
+  });
+
+  document.getElementById('resultado').classList.add('visible');
+}
+
+// Init — mês atual
+const hoje = new Date();
+document.getElementById('mesReferencia').value = hoje.getMonth() + 1;
+document.getElementById('meses').value = hoje.getMonth() + 1;
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const f = document.activeElement; if (f && (f.tagName==='INPUT'||f.tagName==='SELECT')) calcular(); }
+});
+</script>
+</body>
+</html>
